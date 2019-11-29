@@ -31,7 +31,6 @@ public class StressTestingApp {
         System.in.read();
         binding
                 .thenCompose(ServerBinding::unbind)
-                .thenAccept(unbound -> system.terminate()); // and shutdown
-        when done
+                .thenAccept(unbound -> system.terminate()); // and shutdown when done
     }
 }
