@@ -18,10 +18,12 @@ public class StressTestingApp {
     public static void main(String[] args) throws IOException {
         System.out.println("start!");
         ActorSystem system = ActorSystem.create("routes");
+
         final Http http = Http.get(system);
-        final ActorMaterializer materializer =
-                ActorMaterializer.create(system);
+        final ActorMaterializer materializer = ActorMaterializer.create(system);
+        
         final Flow<HttpRequest, HttpResponse, NotUsed> routeFlow = <вызов метода которому передаем Http, ActorSystem и ActorMaterializer>;
+
         final CompletionStage<ServerBinding> binding = http.bindAndHandle(
                 routeFlow,
                 ConnectHttp.toHost("localhost", 8080),
