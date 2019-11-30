@@ -53,5 +53,7 @@ public class StressTestingApp {
 class PingServer {
     private AsyncHttpClient httpClient = Dsl.asyncHttpClient();
 
-    public void 
+    public PingServer() {
+        
+    }
 }
