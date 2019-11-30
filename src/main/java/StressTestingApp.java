@@ -1,4 +1,5 @@
 import akka.NotUsed;
+import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.http.javadsl.ConnectHttp;
@@ -53,6 +54,7 @@ public class StressTestingApp {
 
 class PingServer {
     private AsyncHttpClient httpClient = Dsl.asyncHttpClient();
+    private ActorRef cacheActor;
 
     public PingServer(ActorSystem system) {
         cacheActor = system.actorOf(Props.create());
