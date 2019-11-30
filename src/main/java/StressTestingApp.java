@@ -6,6 +6,8 @@ import akka.http.javadsl.ServerBinding;
 import akka.stream.ActorMaterializer;
 import akka.stream.Supervision;
 import akka.stream.javadsl.Flow;
+import org.asynchttpclient.AsyncHttpClient;
+import org.asynchttpclient.Dsl;
 
 import java.io.IOException;
 import java.net.http.HttpRequest;
@@ -48,6 +50,8 @@ public class StressTestingApp {
     }
 }
 
-class pingServer {
-    
+class PingServer {
+    private AsyncHttpClient httpClient = Dsl.asyncHttpClient();
+
+    public void 
 }
