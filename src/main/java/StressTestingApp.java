@@ -5,15 +5,25 @@ import akka.actor.Props;
 import akka.http.javadsl.ConnectHttp;
 import akka.http.javadsl.Http;
 import akka.http.javadsl.ServerBinding;
+import akka.http.javadsl.model.HttpEntities;
+import akka.http.javadsl.model.StatusCodes;
+import akka.pattern.Patterns;
 import akka.stream.ActorMaterializer;
 import akka.stream.Supervision;
 import akka.stream.javadsl.Flow;
+import akka.stream.javadsl.Keep;
+import akka.stream.javadsl.Sink;
+import akka.stream.javadsl.Source;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.Dsl;
 
+import javax.management.Query;
 import java.io.IOException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
 
@@ -54,9 +64,55 @@ public class StressTestingApp {
 
 class PingServer {
     private AsyncHttpClient httpClient = Dsl.asyncHttpClient();
-    private ActorRef cacheActor;
+    private ActorRef storeActor;
 
     public PingServer(ActorSystem system) {
-        cacheActor = system.actorOf(Props.create());
+        storeActor = system.actorOf(Props.create(ActorSystem.class));
+    }
+
+    Flow<HttpRequest, HttpResponse, NotUsed> getFlow(ActorMaterializer materializer) {
+        return Flow.of(HttpRequest.class)
+                .map((req) -> {
+                    Query reqQuery = req.getUri().query();
+                    String url = reqQuery.getOrElse("url", "");
+                    int idx = Integer.parseInt(reqQuery.getOrElse("idx", "-1"));
+
+                    return new Request(url, idx);
+                })
+                .mapAsync(6, (req) -> Patterns.ask(storeActor, req, 3000)
+                        .thenCompose((res) -> {
+                            Result resultKeeper = (Result) res;
+
+                            return resultKeeper.getAverageResTime() == -1 ? pingExecute(req, materializer) : CompletableFuture.completedFuture((res));
+                        }))
+                .map((result) -> {
+                    storeActor.tell(result, ActorRef.noSender());
+
+                    return HttpResponse
+                            .create()
+                            .withStatus(StatusCodes.OK)
+                            .withEntity(
+                                    HttpEntities.create(
+                                            result.getUrl() +
+                                                    " " +
+                                                    result.getAverageResTime()
+                                    )
+                            );
+                });
+    }
+
+    private CompletionStage<Result> pingExecute(Request request, ActorMaterializer materializer) {
+        return Source
+                .from(Collections.singletonList(request))
+                .toMat(pingSink(), Keep.right())
+                .run(materializer)
+                .thenApply((time) ->
+                        new Result(request.getUrl(), time / request.getIndex() / 1_000_000L))
+        );
+    }
+
+    private Sink<Request, CompletionStage<Long>> pingSink() {
+        return Flow.<Request>create()
+                .mapConcat((request))
     }
 }

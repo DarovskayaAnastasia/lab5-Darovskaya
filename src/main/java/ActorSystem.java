@@ -14,7 +14,7 @@ public class ActorSystem extends AbstractActor {
     public Receive createReceive() {
         return ReceiveBuilder.create()
                 .match(Request.class, (req) -> {
-                    Long result = keeper.getOrDefault(req.getUrl(), 0L);
+                    Long result = keeper.getOrDefault(req.getUrl(), -1L);
                     sender().tell(new Result(req.getUrl(), result), self());
                 })
                 .match(Result.class, (res) -> {
