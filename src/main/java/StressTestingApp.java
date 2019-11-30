@@ -4,12 +4,14 @@ import akka.http.javadsl.ConnectHttp;
 import akka.http.javadsl.Http;
 import akka.http.javadsl.ServerBinding;
 import akka.stream.ActorMaterializer;
+import akka.stream.Supervision;
 import akka.stream.javadsl.Flow;
 
 import java.io.IOException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.concurrent.CompletionStage;
+import java.util.function.Function;
 
 import static jdk.nashorn.internal.parser.TokenType.RETURN;
 
@@ -17,6 +19,14 @@ public class StressTestingApp {
 
     public static void main(String[] args) throws IOException {
         System.out.println("start!");
+        // exceptions
+        final Function<Throwable, Supervision.Directive> decider = exc -> {
+            if (exc instanceof ArithmeticException)
+                return Supervision.resume();
+            else
+                return Supervision.stop();
+        };
+
         ActorSystem system = ActorSystem.create("routes");
 
         final Http http = Http.get(system);
@@ -29,6 +39,7 @@ public class StressTestingApp {
                 ConnectHttp.toHost("localhost", 8080),
                 materializer
         );
+
         System.out.println("Server online at http://localhost:8080/\nPress RETURN to stop...");
         System.in.read();
         binding
