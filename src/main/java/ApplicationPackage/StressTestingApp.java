@@ -107,6 +107,7 @@ class Server {
     }
 
     private CompletionStage<Result> pingExecute(Request request, ActorMaterializer materializer) {
+        System.out.println("_________________average time is -1 _________________");
         return Source
                 .from(Collections.singletonList(request))
                 .toMat(pingSink(), Keep.right())
@@ -117,6 +118,7 @@ class Server {
     }
 
     private Sink<Request, CompletionStage<Long>> pingSink() {
+        System.out.println("_____________average time is not -1 _________________");
         return Flow.<Request>create()
                 .mapConcat((request) -> Collections.nCopies(request.getIndex(), request.getUrl()))
                 .mapAsync(6, (url) -> {
