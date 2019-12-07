@@ -111,7 +111,7 @@ class Server {
                 .toMat(pingSink(), Keep.right())
                 .run(materializer)
                 .thenApply((time) ->
-                        new Result(request.getUrl(), time / request.getIndex() / 1_000_000L))
+                        new Result(request.getUrl(), time / request.getIndex() / 1_000_000L)
         );
     }
 
