@@ -1,5 +1,6 @@
 package ApplicationPackage;
 
+import ActorSystemPackage.StoreActor;
 import MessagesPackage.Request;
 import MessagesPackage.Result;
 import akka.NotUsed;
@@ -71,7 +72,7 @@ class Server {
     private ActorRef storeActor;
 
     Server(ActorSystem system) {
-        storeActor = system.actorOf(create(ActorSystem.class));
+        storeActor = system.actorOf(create(StoreActor.class));
     }
 
     Flow<HttpRequest, HttpResponse, NotUsed> getFlow(ActorMaterializer materializer) {
