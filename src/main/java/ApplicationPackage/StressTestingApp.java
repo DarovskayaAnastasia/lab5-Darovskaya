@@ -38,12 +38,12 @@ public class StressTestingApp {
         System.out.println("start!");
 
         // exceptions
-//        final Function<Throwable, Supervision.Directive> decider = exc -> {
-//            if (exc instanceof ArithmeticException)
-//                return Supervision.resume();
-//            else
-//                return Supervision.stop();
-//        };
+        final Function<Throwable, Supervision.Directive> decider = exc -> {
+            if (exc instanceof ArithmeticException)
+                return Supervision.resume();
+            else
+                return Supervision.stop();
+        };
 
         ActorSystem system = ActorSystem.create("routes");
 
@@ -83,11 +83,15 @@ class Server {
                     String url = reqQuery.getOrElse("url", "");
                     int idx = Integer.parseInt(reqQuery.getOrElse("idx", "-1"));
 
+                    System.out.println("__________________Request is returned_________________");
+
                     return new Request(url, idx);
                 })
                 .mapAsync(4, (req) -> Patterns.ask(storeActor, req, Duration.ofMillis(3000))
                         .thenCompose((res) -> {
                             Result resultKeeper = (Result) res;
+
+                            System.out.println("_________________________Average time if-then-else here_________________");
 
                             return resultKeeper.getAverageResTime() == -1 ? pingExecute(req, materializer) : CompletableFuture.completedFuture((resultKeeper));
                         }))
