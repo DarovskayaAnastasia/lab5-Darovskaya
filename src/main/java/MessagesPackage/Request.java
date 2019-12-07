@@ -1,3 +1,5 @@
+package MessagesPackage;
+
 public class Request {
 
     private String url;
