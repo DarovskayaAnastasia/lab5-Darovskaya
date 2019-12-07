@@ -85,7 +85,7 @@ class Server {
 
                     return new Request(url, idx);
                 })
-                .mapAsync(6, (req) -> Patterns.ask(storeActor, req, Duration.ofMillis(3000))
+                .mapAsync(4, (req) -> Patterns.ask(storeActor, req, Duration.ofMillis(3000))
                         .thenCompose((res) -> {
                             Result resultKeeper = (Result) res;
 
