@@ -72,7 +72,7 @@ class Server {
     private ActorRef storeActor;
 
     Server(ActorSystem system) {
-        storeActor = system.actorOf(create(StoreActor.class));
+        storeActor = system.actorOf(Props.create(StoreActor.class));
     }
 
     Flow<HttpRequest, HttpResponse, NotUsed> getFlow(ActorMaterializer materializer) {
@@ -118,7 +118,6 @@ class Server {
     }
 
     private Sink<Request, CompletionStage<Long>> pingSink() {
-        System.out.println("_____________average time is not -1 _________________");
         return Flow.<Request>create()
                 .mapConcat((request) -> Collections.nCopies(request.getIndex(), request.getUrl()))
                 .mapAsync(6, (url) -> {
