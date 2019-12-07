@@ -93,7 +93,7 @@ class Server {
                         }))
                 .map((result) -> {
                     storeActor.tell(result, ActorRef.noSender());
-
+                    System.out.println(result.getAverageResTime());
                     return HttpResponse
                             .create()
                             .withStatus(StatusCodes.OK)
