@@ -71,12 +71,13 @@ class Server {
     private AsyncHttpClient httpClient = Dsl.asyncHttpClient();
     private ActorRef storeActor;
 
-    public Server(ActorSystem system) {
+    Server(ActorSystem system) {
         storeActor = system.actorOf(Props.create(ActorSystem.class));
     }
 
     Flow<HttpRequest, HttpResponse, NotUsed> getFlow(ActorMaterializer materializer) {
-        return Flow.of(HttpRequest.class)
+        return Flow
+                .of(HttpRequest.class)
                 .map((req) -> {
                     Query reqQuery = req.getUri().query();
                     String url = reqQuery.getOrElse("url", "");
@@ -84,11 +85,11 @@ class Server {
 
                     return new Request(url, idx);
                 })
-                .mapAsync(6, (req) -> Patterns.ask(storeActor, req, 3000)
+                .mapAsync(6, (req) -> Patterns.ask(storeActor, req, Duration.ofMillis(3000))
                         .thenCompose((res) -> {
                             Result resultKeeper = (Result) res;
 
-                            return resultKeeper.getAverageResTime() == -1 ? pingExecute(req, materializer) : CompletableFuture.completedFuture((res));
+                            return resultKeeper.getAverageResTime() == -1 ? pingExecute(req, materializer) : CompletableFuture.completedFuture((resultKeeper));
                         }))
                 .map((result) -> {
                     storeActor.tell(result, ActorRef.noSender());
@@ -98,9 +99,7 @@ class Server {
                             .withStatus(StatusCodes.OK)
                             .withEntity(
                                     HttpEntities.create(
-                                            result.getUrl() +
-                                                    " " +
-                                                    result.getAverageResTime()
+                                            result.getUrl() + " " + result.getAverageResTime()
                                     )
                             );
                 });
