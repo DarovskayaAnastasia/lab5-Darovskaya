@@ -113,6 +113,16 @@ class PingServer {
 
     private Sink<Request, CompletionStage<Long>> pingSink() {
         return Flow.<Request>create()
-                .mapConcat((request))
+                .mapConcat((request) -> Collections.nCopies(request.getIndex(), request.getUrl()))
+                .mapConcat(6, (url) -> {
+                    Long beginTime = System.nanoTime();
+
+                    return httpClient
+                            .prepareGet(url)
+                            .execute()
+                            .toCompletableFuture()
+                            .thenApply((response) -> System.nanoTime() - beginTime);
+                })
+                .toMat(Sink.fold(0L, Long::sum), Keep.right());
     }
 }
