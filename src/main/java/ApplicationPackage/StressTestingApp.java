@@ -122,6 +122,7 @@ class Server {
                 .mapConcat((request) -> Collections.nCopies(request.getIndex(), request.getUrl()))
                 .mapAsync(6, (url) -> {
                     long beginTime = System.nanoTime();
+                    System.out.println("Exec request!");
 
                     return httpClient
                             .prepareGet(url)
