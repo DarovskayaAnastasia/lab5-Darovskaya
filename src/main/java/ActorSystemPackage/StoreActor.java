@@ -8,7 +8,7 @@ import akka.japi.pf.ReceiveBuilder;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ActorSystem extends AbstractActor {
+public class StoreActor extends AbstractActor {
 
     private Map<String, Long> keeper = new HashMap<>();
 
