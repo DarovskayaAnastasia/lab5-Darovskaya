@@ -21,18 +21,16 @@ import javax.management.Query;
 import java.io.IOException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
 
-import static jdk.nashorn.internal.parser.TokenType.RETURN;
-
 public class StressTestingApp {
 
     public static void main(String[] args) throws IOException {
         System.out.println("start!");
+        
         // exceptions
         final Function<Throwable, Supervision.Directive> decider = exc -> {
             if (exc instanceof ArithmeticException)
@@ -46,8 +44,8 @@ public class StressTestingApp {
         final Http http = Http.get(system);
         final ActorMaterializer materializer = ActorMaterializer.create(system);
 
-        final PingServer server = new PingServer(system);
-        final Flow<HttpRequest, HttpResponse, NotUsed> routeFlow = server.getFlow()
+        final Server server = new Server(system);
+        final Flow<HttpRequest, HttpResponse, NotUsed> routeFlow = server.getFlow(materializer);
 
         final CompletionStage<ServerBinding> binding = http.bindAndHandle(
                 routeFlow,
@@ -63,11 +61,11 @@ public class StressTestingApp {
     }
 }
 
-class PingServer {
+class Server {
     private AsyncHttpClient httpClient = Dsl.asyncHttpClient();
     private ActorRef storeActor;
 
-    public PingServer(ActorSystem system) {
+    public Server(ActorSystem system) {
         storeActor = system.actorOf(Props.create(ActorSystem.class));
     }
 
