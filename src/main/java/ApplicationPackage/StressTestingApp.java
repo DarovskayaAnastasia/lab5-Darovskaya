@@ -38,12 +38,12 @@ public class StressTestingApp {
         System.out.println("start!");
 
         // exceptions
-        final Function<Throwable, Supervision.Directive> decider = exc -> {
-            if (exc instanceof ArithmeticException)
-                return Supervision.resume();
-            else
-                return Supervision.stop();
-        };
+//        final Function<Throwable, Supervision.Directive> decider = exc -> {
+//            if (exc instanceof ArithmeticException)
+//                return Supervision.resume();
+//            else
+//                return Supervision.stop();
+//        };
 
         ActorSystem system = ActorSystem.create("routes");
 
