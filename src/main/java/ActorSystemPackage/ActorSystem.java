@@ -1,5 +1,7 @@
 package ActorSystemPackage;
 
+import MessagesPackage.Request;
+import MessagesPackage.Result;
 import akka.actor.AbstractActor;
 import akka.japi.pf.ReceiveBuilder;
 

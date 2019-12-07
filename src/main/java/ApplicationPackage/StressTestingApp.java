@@ -1,5 +1,7 @@
 package ApplicationPackage;
 
+import MessagesPackage.Request;
+import MessagesPackage.Result;
 import akka.NotUsed;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
@@ -26,6 +28,8 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+
+import static akka.actor.Props.*;
 
 public class StressTestingApp {
 
@@ -67,7 +71,7 @@ class Server {
     private ActorRef storeActor;
 
     Server(ActorSystem system) {
-        storeActor = system.actorOf(Props.create(ActorSystem.class));
+        storeActor = system.actorOf(create(ActorSystem.class));
     }
 
     Flow<HttpRequest, HttpResponse, NotUsed> getFlow(ActorMaterializer materializer) {

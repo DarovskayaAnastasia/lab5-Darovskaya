@@ -1,3 +1,5 @@
+package MessagesPackage;
+
 public class Result {
 
     private String url;
