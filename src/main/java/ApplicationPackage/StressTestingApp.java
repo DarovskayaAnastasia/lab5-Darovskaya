@@ -97,10 +97,7 @@ class Server {
                     return HttpResponse
                             .create()
                             .withStatus(StatusCodes.OK)
-                            .withEntity(
-                                    HttpEntities.create(
-                                            result.getUrl() + " " + result.getAverageResTime()
-                                    )
+                            .withEntity(result.getUrl() + " " + result.getAverageResTime()
                             );
                 });
     }
