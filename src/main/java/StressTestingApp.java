@@ -118,8 +118,8 @@ class Server {
     private Sink<Request, CompletionStage<Long>> pingSink() {
         return Flow.<Request>create()
                 .mapConcat((request) -> Collections.nCopies(request.getIndex(), request.getUrl()))
-                .mapConcat(6, (url) -> {
-                    Long beginTime = System.nanoTime();
+                .mapAsync(6, (url) -> {
+                    long beginTime = System.nanoTime();
 
                     return httpClient
                             .prepareGet(url)
