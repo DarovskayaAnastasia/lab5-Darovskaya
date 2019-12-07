@@ -12,7 +12,7 @@ public class StoreActor extends AbstractActor {
 
     private Map<String, Long> keeper = new HashMap<>();
 
-    public ActorSystem() {}
+    public StoreActor() {}
 
     @Override
     public Receive createReceive() {
